@@ -235,7 +235,10 @@ export function PassportPhotoPro() {
             ctx.fillStyle = '#ffffff'
             ctx.fillRect(0, 0, width, height)
 
-            const scale = Math.min(
+            // Use cover scaling: fills the photo area completely so the border
+            // touches the image edge on all 4 sides (no top/bottom gap).
+            // Canvas naturally clips any overflow beyond its boundaries.
+            const scale = Math.max(
               (width - advancedSettings.border * 2) / img.width,
               (height - advancedSettings.border * 2) / img.height
             )

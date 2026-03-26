@@ -303,13 +303,16 @@ export async function POST(request: NextRequest) {
           })
           
           // Draw black border around the image (slim border)
+          // Inset by half the borderWidth so the stroke sits exactly on the edge
+          const bw = 0.75
+          const half = bw / 2
           page.drawRectangle({
-            x,
-            y,
-            width: photoWidthPt,
-            height: photoHeightPt,
+            x: x + half,
+            y: y + half,
+            width: photoWidthPt - bw,
+            height: photoHeightPt - bw,
             borderColor: rgb(0, 0, 0), // Black border
-            borderWidth: 0.75, // Slim border thickness
+            borderWidth: bw,
           })
         } catch (error) {
           console.error('Error embedding image in PDF:', error)
