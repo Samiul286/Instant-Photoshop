@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passport Photo Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://res.cloudinary.com/dcajb02df/image/upload/v1753960691/logo_pyncju.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    :root {
+      --cream: #faf7f2;
+      --warm-white: #ffffff;
+      --sand: #f0ebe1;
+      --muted: #e8e2d6;
+      --border: #d6cfc2;
+      --text-dark: #1c1a17;
+      --text-mid: #4a4540;
+      --text-light: #8a8178;
+      --accent: #c8773a;
+      --accent-hover: #b36832;
+      --accent-light: #fdf1e8;
+      --accent-muted: #eeddc8;
+      --green: #3a8c5c;
+      --green-light: #e8f5ee;
+      --red: #c0392b;
+      --blue: #2d6a9f;
+      --shadow-sm: 0 1px 4px rgba(28,26,23,0.06);
+      --shadow-md: 0 4px 20px rgba(28,26,23,0.08);
+      --shadow-lg: 0 12px 48px rgba(28,26,23,0.12);
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* Decorative background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 10%, rgba(200,119,58,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 90% 90%, rgba(45,106,159,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(240,235,225,0.8) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(28,26,23,0.025) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(28,26,23,0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ---- HEADER ---- */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(250,247,242,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-mark svg { width: 18px; height: 18px; color: white; }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    .beta-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid var(--accent-muted);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+
+    /* ---- BETA BANNER ---- */
+    .beta-banner {
+      background: linear-gradient(135deg, var(--accent) 0%, #e08040 100%);
+      color: white;
+      padding: 8px 24px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      overflow: hidden;
+    }
+
+    /* ---- MAIN ---- */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--text-light);
+      font-weight: 300;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ---- CARD ---- */
+    .card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--muted);
+    }
+
+    /* ---- API KEY SECTION ---- */
+    .api-key-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .api-key-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .api-key-input-wrap input {
+      width: 100%;
+      padding: 11px 44px 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .api-key-input-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,119,58,0.12);
+    }
+
+    .toggle-key-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-key-btn:hover { color: var(--accent); }
+
+    .api-key-hint {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 8px;
+    }
+
+    .api-key-hint a { color: var(--accent); text-decoration: none; }
+    .api-key-hint a:hover { text-decoration: underline; }
+
+    /* ---- DROP ZONE ---- */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 44px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: var(--cream);
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drop-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent-muted);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      transition: transform 0.2s;
+    }
+
+    .drop-zone:hover .drop-icon {
+      transform: scale(1.05);
+    }
+
+    .drop-icon svg { width: 24px; height: 24px; color: var(--accent); }
+
+    .drop-zone h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .drop-zone p {
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+
+    /* ---- PHOTO LIST ---- */
+    #photoList { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    .photo-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .photo-card:hover {
+      border-color: var(--accent-muted);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .photo-thumb {
+      width: 52px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .photo-info { flex: 1; min-width: 0; }
+
+    .photo-name {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .photo-status {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 3px;
+    }
+
+    .copies-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+    .copies-wrap label { font-size: 0.72rem; color: var(--text-light); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .copies-input {
+      width: 60px;
+      padding: 6px;
+      text-align: center;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--warm-white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .copies-input:focus { outline: none; border-color: var(--accent); }
+
+    .photo-actions { display: flex; flex-direction: column; gap: 6px; }
+
+    .btn-crop, .btn-remove {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-crop {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-color: var(--accent-muted);
+    }
+
+    .btn-crop:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .btn-remove {
+      background: #fdf0ef;
+      color: var(--red);
+      border-color: #f5c5c1;
+    }
+
+    .btn-remove:hover { background: var(--red); color: white; border-color: var(--red); }
+
+    /* ---- ADD MORE ---- */
+    #addMoreWrapper { text-align: center; margin-top: 12px; }
+
+    #addMoreBtn {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1px dashed var(--accent-muted);
+      border-radius: var(--radius-sm);
+      padding: 9px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    #addMoreBtn:hover { background: var(--accent); color: white; border-style: solid; border-color: var(--accent); }
+
+    /* ---- ADVANCED OPTIONS ---- */
+    .advanced-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--text-light);
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: color 0.2s;
+      margin: 0 auto;
+    }
+
+    .advanced-toggle:hover { color: var(--accent); }
+
+    .advanced-toggle svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.3s;
+    }
+
+    .advanced-toggle.open svg { transform: rotate(180deg); }
+
+    .advanced-panel {
+      display: none;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin-top: 12px;
+    }
+
+    .advanced-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+    }
+
+    .field-group input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--warm-white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,119,58,0.1);
+    }
+
+    /* ---- ACTION BUTTONS ---- */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(200,119,58,0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      box-shadow: 0 6px 20px rgba(200,119,58,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-download {
+      flex: 1;
+      padding: 14px 28px;
+      background: var(--green-light);
+      color: var(--green);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 1.5px solid #b3dcc4;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-download:hover {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+      transform: translateY(-1px);
+    }
+
+    /* ---- LOADING ---- */
+    #loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 16px;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--accent-muted);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- PDF PREVIEW ---- */
+    #pdfPreview {
+      width: 100%;
+      height: 520px;
+      margin-top: 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    /* ---- CROPPER MODAL ---- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28,26,23,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-box {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+    }
+
+    .modal-image-wrap {
+      max-height: 400px;
+      overflow: hidden;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .modal-image-wrap img { max-width: 100%; display: block; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      justify-content: flex-end;
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      background: var(--sand);
+      color: var(--text-mid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover { background: var(--muted); }
+
+    /* ---- NOTIFICATION ---- */
+    #notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 200;
+      max-width: 320px;
+    }
+
+    #notification.show { transform: translateX(0); }
+
+    #notification.error { background: #fff0ef; color: var(--red); border: 1px solid #f5c5c1; }
+    #notification.success { background: var(--green-light); color: var(--green); border: 1px solid #b3dcc4; }
+
+    /* ---- FEEDBACK ---- */
+    #feedbackBtn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(200,119,58,0.4);
+      transition: all 0.25s;
+      z-index: 50;
+    }
+
+    #feedbackBtn:hover {
+      background: var(--accent-hover);
+      transform: scale(1.08);
+    }
+
+    #feedbackModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(28,26,23,0.65);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .feedback-box {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 440px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feedback-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--sand);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-mid);
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover { background: var(--muted); }
+
+    .feedback-box input,
+    .feedback-box textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    .feedback-box input:focus,
+    .feedback-box textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* ---- UTIL ---- */
+    .hidden { display: none !important; }
+
+    @media (max-width: 520px) {
+      .advanced-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .photo-card { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-mark">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <span class="logo-text">Passport <span>Photo</span> Pro</span>
+      </div>
+      <span class="beta-pill">Beta</span>
+    </div>
+  </header>
+
+  <!-- Beta Banner -->
+  <div class="beta-banner">
+    <marquee behavior="scroll" direction="left" scrollamount="4">
+      🚧 &nbsp; This site is currently in beta. If you encounter any issues, please use the feedback button to report them. Thank you for your patience!
+    </marquee>
+  </div>
+
+  <main>
+
+    <!-- Hero -->
+    <div class="hero">
+      <span class="hero-eyebrow">✦ Professional Results at Home</span>
+      <h1>Create perfect <em>passport photos</em> in seconds</h1>
+      <p>Upload your photo, we'll remove the background, enhance it, and generate a print-ready sheet on A4.</p>
+    </div>
+
+    <!-- API Key Card -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent)">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+        Remove.bg API Key
+      </div>
+      <div class="api-key-wrapper">
+        <div class="api-key-input-wrap">
+          <input type="password" id="removeBgApiKey" placeholder="Paste your remove.bg API key here…" autocomplete="off" spellcheck="false"/>
+          <button class="toggle-key-btn" id="toggleKeyVisibility" title="Toggle visibility">
+            <svg id="eyeIcon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p class="api-key-hint">
+        Your key is sent directly to the server for this request and never stored. &nbsp;
+        <a href="https://www.remove.bg/api" target="_blank" rel="noopener">Get a free API key →</a>
+      </p>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent)">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Upload Photos
+      </div>
+
+      <input type="file" id="imageInput" class="hidden" accept="image/*" multiple />
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+        </div>
+        <h3>Drag & drop or click to upload</h3>
+        <p>Multiple photos supported · JPG, PNG, WEBP</p>
+      </div>
+
+      <div id="photoList"></div>
+
+      <div id="addMoreWrapper" class="hidden">
+        <button id="addMoreBtn">+ Add more photos</button>
+      </div>
+
+      <!-- Advanced Options -->
+      <div style="margin-top: 20px;">
+        <button class="advanced-toggle" id="toggleAdvanced">
+          Advanced options
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="advanced-panel" id="advancedOptions">
+          <div class="advanced-grid">
+            <div class="field-group">
+              <label>Width (px)</label>
+              <input type="number" id="width" value="390"/>
+            </div>
+            <div class="field-group">
+              <label>Height (px)</label>
+              <input type="number" id="height" value="480"/>
+            </div>
+            <div class="field-group">
+              <label>Spacing (px)</label>
+              <input type="number" id="spacing" value="10"/>
+            </div>
+            <div class="field-group">
+              <label>Border (px)</label>
+              <input type="number" id="border" value="2"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn-primary" id="generateBtn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Generate Sheet
+        </button>
+        <button class="btn-download hidden" id="downloadBtn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Download PDF
+        </button>
+      </div>
+
+      <div id="loading">
+        <div class="spinner"></div>
+        Processing images — this may take a moment…
+      </div>
+
+      <embed id="pdfPreview" type="application/pdf"/>
+    </div>
+
+  </main>
+
+  <!-- Cropper Modal -->
+  <div id="cropperModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3 class="modal-title">Crop Photo</h3>
+      <div class="modal-image-wrap">
+        <img id="cropModalImage" src="" style="max-width:100%; display:block;"/>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelCropBtn" class="btn-secondary">Cancel</button>
+        <button id="confirmCropBtn" class="btn-primary" style="flex:none; padding:10px 22px;">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Button -->
+  <button id="feedbackBtn" title="Send feedback">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+    </svg>
+  </button>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="hidden">
+    <div class="feedback-box">
+      <button id="closeModal" class="close-btn">&times;</button>
+      <h2>Feedback / Bug Report</h2>
+      <form id="feedbackForm">
+        <input type="text" name="contact" placeholder="Your email or phone number" required/>
+        <textarea name="message" placeholder="Describe your issue or suggestion…" rows="4" required></textarea>
+        <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Submit Feedback</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div id="notification">
+    <p id="notification-message"></p>
+  </div>
+
+  <script>
+    emailjs.init("XJqjmVHK4ISEX0Zam");
+
+    // ---- State ----
+    let photos = [];
+    let nextId = 0;
+    let activeCropper = null;
+    let pendingCropId = null;
+
+    // DOM refs
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const photoList = document.getElementById('photoList');
+    const addMoreWrapper = document.getElementById('addMoreWrapper');
+    const addMoreBtn = document.getElementById('addMoreBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const pdfPreview = document.getElementById('pdfPreview');
+    const loading = document.getElementById('loading');
+    const toggleAdvanced = document.getElementById('toggleAdvanced');
+    const advancedOptions = document.getElementById('advancedOptions');
+    const cropperModal = document.getElementById('cropperModal');
+    const cropModalImage = document.getElementById('cropModalImage');
+    const confirmCropBtn = document.getElementById('confirmCropBtn');
+    const cancelCropBtn = document.getElementById('cancelCropBtn');
+    const notification = document.getElementById('notification');
+    const notifMsg = document.getElementById('notification-message');
+    const feedbackBtn = document.getElementById('feedbackBtn');
+    const feedbackModal = document.getElementById('feedbackModal');
+    const closeModal = document.getElementById('closeModal');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const removeBgApiKey = document.getElementById('removeBgApiKey');
+    const toggleKeyVisibility = document.getElementById('toggleKeyVisibility');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // ---- Toggle key visibility ----
+    toggleKeyVisibility.addEventListener('click', () => {
+      const isPassword = removeBgApiKey.type === 'password';
+      removeBgApiKey.type = isPassword ? 'text' : 'password';
+      eyeIcon.innerHTML = isPassword
+        ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`
+        : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+    });
+
+    // ---- Notifications ----
+    function showNotification(msg, isError = true) {
+      notifMsg.textContent = msg;
+      notification.classList.remove('error', 'success', 'show');
+      notification.classList.add(isError ? 'error' : 'success');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => notification.classList.add('show'));
+      });
+      setTimeout(() => notification.classList.remove('show'), 4000);
+    }
+
+    // ---- Render Photo Cards ----
+    function renderPhotoList() {
+      photoList.innerHTML = '';
+      photos.forEach(photo => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.innerHTML = `
+          <img src="${photo.previewUrl}" class="photo-thumb" />
+          <div class="photo-info">
+            <div class="photo-name">${photo.originalFile.name}</div>
+            <div class="photo-status">${photo.croppedFile ? '✅ Cropped' : '⚠️ Original'}</div>
+          </div>
+          <div class="copies-wrap">
+            <label>Copies</label>
+            <input type="number" class="copies-input" value="${photo.copies}" min="1" max="54" data-id="${photo.id}" />
+          </div>
+          <div class="photo-actions">
+            <button class="btn-crop" data-id="${photo.id}">Crop</button>
+            <button class="btn-remove" data-id="${photo.id}">Remove</button>
+          </div>
+        `;
+        photoList.appendChild(card);
+      });
+
+      photoList.querySelectorAll('.copies-input').forEach(input => {
+        input.addEventListener('change', e => {
+          const id = parseInt(e.target.dataset.id);
+          const photo = photos.find(p => p.id === id);
+          if (photo) photo.copies = Math.max(1, parseInt(e.target.value) || 1);
+        });
+      });
+
+      photoList.querySelectorAll('.btn-crop').forEach(btn => {
+        btn.addEventListener('click', e => openCropper(parseInt(e.target.dataset.id)));
+      });
+
+      photoList.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', e => {
+          photos = photos.filter(p => p.id !== parseInt(e.target.dataset.id));
+          renderPhotoList();
+          if (photos.length === 0) addMoreWrapper.classList.add('hidden');
+        });
+      });
+
+      addMoreWrapper.classList.toggle('hidden', photos.length === 0);
+    }
+
+    // ---- Add Files ----
+    function addFiles(files) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      let added = 0;
+      Array.from(files).forEach(file => {
+        if (!validTypes.includes(file.type)) return;
+        photos.push({ id: nextId++, originalFile: file, croppedFile: null, previewUrl: URL.createObjectURL(file), copies: 6 });
+        added++;
+      });
+      if (added === 0) showNotification("Please upload valid image files (JPG, PNG, WEBP).");
+      renderPhotoList();
+    }
+
+    // ---- Drop Zone ----
+    dropZone.addEventListener('click', () => imageInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(e.dataTransfer.files); });
+    imageInput.addEventListener('change', () => { addFiles(imageInput.files); imageInput.value = ''; });
+    addMoreBtn.addEventListener('click', () => imageInput.click());
+
+    // ---- Cropper Modal ----
+    function openCropper(id) {
+      const photo = photos.find(p => p.id === id);
+      if (!photo) return;
+      pendingCropId = id;
+      cropModalImage.src = photo.previewUrl;
+      cropperModal.classList.remove('hidden');
+      if (activeCropper) activeCropper.destroy();
+      activeCropper = new Cropper(cropModalImage, {
+        aspectRatio: 384 / 472,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 1,
+      });
+    }
+
+    confirmCropBtn.addEventListener('click', () => {
+      if (!activeCropper || pendingCropId === null) return;
+      const canvas = activeCropper.getCroppedCanvas({ width: 400, height: 480 });
+      canvas.toBlob(blob => {
+        const photo = photos.find(p => p.id === pendingCropId);
+        if (!photo) return;
+        photo.croppedFile = new File([blob], 'cropped-' + photo.originalFile.name, { type: 'image/png' });
+        photo.previewUrl = URL.createObjectURL(blob);
+        activeCropper.destroy(); activeCropper = null; pendingCropId = null;
+        cropperModal.classList.add('hidden');
+        renderPhotoList();
+        showNotification("Photo cropped successfully.", false);
+      }, 'image/png');
+    });
+
+    cancelCropBtn.addEventListener('click', () => {
+      if (activeCropper) { activeCropper.destroy(); activeCropper = null; }
+      pendingCropId = null;
+      cropperModal.classList.add('hidden');
+    });
+
+    // ---- Advanced Options ----
+    toggleAdvanced.addEventListener('click', () => {
+      const isOpen = advancedOptions.style.display === 'block';
+      advancedOptions.style.display = isOpen ? 'none' : 'block';
+      toggleAdvanced.classList.toggle('open', !isOpen);
+    });
+
+    // ---- Generate PDF ----
+    generateBtn.addEventListener('click', () => {
+      if (photos.length === 0) { showNotification("Please upload at least one photo."); return; }
+
+      const apiKey = removeBgApiKey.value.trim();
+      if (!apiKey) { showNotification("Please enter your remove.bg API key."); return; }
+
+      const formData = new FormData();
+      formData.append('remove_bg_api_key', apiKey);
+      photos.forEach((photo, i) => {
+        formData.append(`image_${i}`, photo.croppedFile || photo.originalFile);
+        formData.append(`copies_${i}`, photo.copies);
+      });
+      formData.append('width', document.getElementById('width').value);
+      formData.append('height', document.getElementById('height').value);
+      formData.append('spacing', document.getElementById('spacing').value);
+      formData.append('border', document.getElementById('border').value);
+
+      loading.style.display = 'flex';
+      generateBtn.disabled = true;
+      downloadBtn.classList.add('hidden');
+      pdfPreview.style.display = 'none';
+
+      fetch('/process', { method: 'POST', body: formData })
+        .then(async response => {
+          if (response.status === 400) { showNotification("No API key provided."); return null; }
+          if (response.status === 402) { showNotification("Invalid or exhausted remove.bg API key. Please check and try again."); return null; }
+          if (response.status === 429) { showNotification("Server daily quota exceeded. Please try again later."); return null; }
+          if (response.status === 410) { showNotification("Cannot detect face/background in one of the images."); return null; }
+          if (response.status === 500) { showNotification("Internal error, please try again later."); return null; }
+          if (!response.ok) throw new Error("Processing failed.");
+          return response.blob();
+        })
+        .then(blob => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          pdfPreview.style.display = 'block';
+          pdfPreview.src = url;
+          downloadBtn.classList.remove('hidden');
+          downloadBtn.onclick = () => {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'passport-sheet.pdf';
+            link.click();
+          };
+          showNotification("PDF generated successfully!", false);
+        })
+        .catch(err => {
+          console.error(err);
+          showNotification("Image processing failed. Try again later.");
+        })
+        .finally(() => {
+          loading.style.display = 'none';
+          generateBtn.disabled = false;
+        });
+    });
+
+    // ---- Feedback ----
+    feedbackBtn.addEventListener('click', () => feedbackModal.classList.remove('hidden'));
+    closeModal.addEventListener('click', () => feedbackModal.classList.add('hidden'));
+    feedbackForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const contact = feedbackForm.contact.value.trim();
+      const message = feedbackForm.message.value.trim();
+      if (!contact || !message) { showNotification("Please fill out all fields."); return; }
+      const btn = feedbackForm.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      emailjs.send("service_aoewzsq", "template_hbw13lt", {
+        contact, message,
+        user_agent: navigator.userAgent,
+        time: new Date().toLocaleString()
+      }).then(() => {
+        showNotification("Feedback submitted. Thank you!", false);
+        feedbackModal.classList.add('hidden');
+        feedbackForm.reset();
+      }).catch(err => {
+        console.error(err);
+        showNotification("Failed to send feedback. Please try again.");
+      }).finally(() => {
+        btn.disabled = false; btn.textContent = 'Submit Feedback';
+      });
+    });
+  </script>
+</body>
+</html>
